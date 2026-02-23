@@ -34,13 +34,13 @@ public class GroundedState : IGravityState
     public void Enter(Rigidbody rb)
     {
         rb.useGravity = true;
-        rb.drag = 1f;
+        rb.linearDamping = 1f;
     }
 
     public void Exit(Rigidbody rb)
     {
         rb.useGravity = false;
-        rb.drag = 0f;
+        rb.linearDamping = 0f;
     }
 
     public void FixedUpdate(Rigidbody rb, PlayerInput input)
@@ -67,7 +67,9 @@ public class GroundedState : IGravityState
 
     private void ApplyJump(Rigidbody rb, PlayerInput input)
     {
+        
         if (!input.JumpPressed) return;
+        Debug.Log("jump pressed:" + input.JumpPressed + ", grounded:" + IsGrounded(rb));
         if (!IsGrounded(rb)) return;
 
         rb.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);

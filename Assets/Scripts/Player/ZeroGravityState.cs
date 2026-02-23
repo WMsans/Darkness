@@ -28,13 +28,13 @@ public class ZeroGravityState : IGravityState
     public void Enter(Rigidbody rb)
     {
         rb.useGravity = false;
-        rb.drag = 0.1f;
+        rb.linearDamping = 0.1f;
     }
 
     public void Exit(Rigidbody rb)
     {
         rb.useGravity = true;
-        rb.drag = 1f;
+        rb.linearDamping = 1f;
         _targetLock.Release();
     }
 
