@@ -46,6 +46,38 @@ public class GridManager : MonoBehaviour
         return _edges.ContainsKey(edge);
     }
 
+    /// <summary>
+    /// Returns the equivalent GridEdge from the adjacent cell that shares the same
+    /// physical face. For example, cell (0,0,0) Up == cell (0,1,0) Down.
+    /// Only works for cardinal directions; returns null for diagonals.
+    /// </summary>
+    public static GridEdge? GetOppositeFaceEdge(GridEdge edge)
+    {
+        EdgeDirection opposite = GridEdge.GetOpposite(edge.Direction);
+        if (opposite == EdgeDirection.None)
+            return null;
+
+        Vector3Int neighborCell = edge.Cell + Vector3Int.RoundToInt(GridEdge.GetDirectionOffset(edge.Direction));
+        return new GridEdge(neighborCell, opposite);
+    }
+
+    /// <summary>
+    /// Checks whether a board already exists at the same physical location,
+    /// either as the exact same GridEdge or as the equivalent opposite face
+    /// on the neighboring cell.
+    /// </summary>
+    public bool HasBoardAtFace(GridEdge edge)
+    {
+        if (_edges.ContainsKey(edge))
+            return true;
+
+        GridEdge? opposite = GetOppositeFaceEdge(edge);
+        if (opposite.HasValue && _edges.ContainsKey(opposite.Value))
+            return true;
+
+        return false;
+    }
+
     public BoardData? GetBoardData(GridEdge edge)
     {
         return _edges.TryGetValue(edge, out BoardData data) ? data : null;
@@ -58,7 +90,7 @@ public class GridManager : MonoBehaviour
 
     public bool TryPlaceBoard(GridEdge edge, BoardData data)
     {
-        if (HasEdge(edge))
+        if (HasBoardAtFace(edge))
             return false;
 
         _edges[edge] = data;
@@ -86,6 +118,11 @@ public class GridManager : MonoBehaviour
 
         GameObject board = Instantiate(_boardPrefab, worldPos, rotation, transform);
         board.name = $"Board_{edge.Cell}_{edge.Direction}";
+
+        BoardVisual visual = board.GetComponent<BoardVisual>();
+        if (visual != null)
+            visual.Initialize(edge);
+
         _boardObjects[edge] = board;
     }
 
@@ -98,7 +135,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    private Quaternion GetBoardRotation(EdgeDirection direction)
+    public static Quaternion GetBoardRotation(EdgeDirection direction)
     {
         return direction switch
         {
