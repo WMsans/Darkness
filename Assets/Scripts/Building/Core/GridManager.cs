@@ -114,6 +114,9 @@ public class GridManager : MonoBehaviour
 
     public bool HasAdjacentBoard(GridEdge edge)
     {
+        if (_edges.Count == 0)
+            return true;
+
         if (edge.IsDiagonal())
         {
             return CheckDiagonalAdjacency(edge);

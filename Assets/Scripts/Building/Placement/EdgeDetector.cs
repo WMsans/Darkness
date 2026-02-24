@@ -33,7 +33,37 @@ public static class EdgeDetector
             return DetectFromHit(hit, gridManager);
         }
 
+        if (gridManager.BoardCount == 0)
+        {
+            return GetFreePlacementEdge(origin, direction, maxDistance, gridManager);
+        }
+
         return EdgeHit.Invalid;
+    }
+
+    private static EdgeHit GetFreePlacementEdge(Vector3 origin, Vector3 direction, float distance, GridManager gridManager)
+    {
+        Vector3 placePos = origin + direction * (distance * 0.5f);
+        Vector3Int cell = gridManager.WorldToCell(placePos);
+        
+        EdgeDirection edgeDir = DetermineFreePlacementDirection(direction);
+        GridEdge edge = new GridEdge(cell, edgeDir);
+        Vector3 worldPos = edge.GetWorldPosition(gridManager.CellSize);
+        
+        return new EdgeHit(edge, true, worldPos);
+    }
+
+    private static EdgeDirection DetermineFreePlacementDirection(Vector3 lookDirection)
+    {
+        float ax = Mathf.Abs(lookDirection.x);
+        float ay = Mathf.Abs(lookDirection.y);
+        float az = Mathf.Abs(lookDirection.z);
+
+        if (ay >= ax && ay >= az)
+            return lookDirection.y > 0 ? EdgeDirection.Down : EdgeDirection.Up;
+        if (ax >= az)
+            return lookDirection.x > 0 ? EdgeDirection.Left : EdgeDirection.Right;
+        return lookDirection.z > 0 ? EdgeDirection.Back : EdgeDirection.Forward;
     }
 
     private static EdgeHit DetectFromHit(RaycastHit hit, GridManager gridManager)
