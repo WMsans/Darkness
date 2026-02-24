@@ -58,9 +58,12 @@ public class BoardPlacer : MonoBehaviour
     {
         if (_preview == null) return;
 
-        if (_currentEdgeHit.IsValid || _currentEdgeHit.Edge.Direction != EdgeDirection.None)
+        bool hasDirection = _currentEdgeHit.IsValid || _currentEdgeHit.Edge.Direction != EdgeDirection.None;
+        bool isOccupied = _gridManager.HasBoardAtFace(_currentEdgeHit.Edge);
+
+        if (hasDirection && !isOccupied)
         {
-            Quaternion rotation = GetBoardRotation(_currentEdgeHit.Edge.Direction);
+            Quaternion rotation = GridManager.GetBoardRotation(_currentEdgeHit.Edge.Direction);
             _preview.Show(_currentEdgeHit.Edge, _currentEdgeHit.WorldPosition, rotation, _currentEdgeHit.IsValid);
             _events?.RaisePreviewChanged(_currentEdgeHit.Edge);
         }
@@ -89,7 +92,7 @@ public class BoardPlacer : MonoBehaviour
         if (!_currentEdgeHit.IsValid)
             return;
 
-        if (_gridManager.HasEdge(_currentEdgeHit.Edge))
+        if (_gridManager.HasBoardAtFace(_currentEdgeHit.Edge))
             return;
 
         BoardData data = BoardData.Default;
@@ -110,20 +113,6 @@ public class BoardPlacer : MonoBehaviour
         {
             _gridManager.RemoveBoard(edgeToRemove.Value);
         }
-    }
-
-    private Quaternion GetBoardRotation(EdgeDirection direction)
-    {
-        return direction switch
-        {
-            EdgeDirection.Up => Quaternion.Euler(0, 0, 0),
-            EdgeDirection.Down => Quaternion.Euler(180, 0, 0),
-            EdgeDirection.Left => Quaternion.Euler(0, 0, 90),
-            EdgeDirection.Right => Quaternion.Euler(0, 0, -90),
-            EdgeDirection.Forward => Quaternion.Euler(90, 0, 0),
-            EdgeDirection.Back => Quaternion.Euler(-90, 0, 0),
-            _ => Quaternion.LookRotation(GridEdge.GetDirectionOffset(direction))
-        };
     }
 
     public void SetPlacementEnabled(bool enabled)
