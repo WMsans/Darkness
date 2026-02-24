@@ -8,8 +8,10 @@ public class TargetLock
     private readonly float _releaseRange;
 
     private Collider _lockedTarget;
+    private Collider _currentCandidate;
 
     public bool IsLocked => _lockedTarget != null;
+    public Collider CurrentCandidate => _currentCandidate;
     public Collider Target => _lockedTarget;
     public Vector3 TargetVelocity => GetTargetVelocity();
 
@@ -19,6 +21,34 @@ public class TargetLock
         _lockRange = lockRange;
         _lockRadius = lockRadius;
         _releaseRange = releaseRange;
+    }
+
+    public void UpdateCandidate()
+    {
+        if (_lockedTarget != null)
+        {
+            _currentCandidate = null;
+            return;
+        }
+
+        if (Physics.SphereCast(
+            _cameraTransform.position,
+            _lockRadius,
+            _cameraTransform.forward,
+            out RaycastHit hit,
+            _lockRange))
+        {
+            if (_currentCandidate != hit.collider)
+            {
+                _currentCandidate = hit.collider;
+                LockEvents.CandidateChanged(_currentCandidate);
+            }
+        }
+        else if (_currentCandidate != null)
+        {
+            _currentCandidate = null;
+            LockEvents.CandidateChanged(null);
+        }
     }
 
     public void TryLock()
@@ -31,12 +61,16 @@ public class TargetLock
             _lockRange))
         {
             _lockedTarget = hit.collider;
+            _currentCandidate = null;
+            LockEvents.TargetLocked(_lockedTarget);
+            LockEvents.CandidateChanged(null);
         }
     }
 
     public void Release()
     {
         _lockedTarget = null;
+        LockEvents.TargetReleased();
     }
 
     public void CheckRelease(Transform playerTransform)
