@@ -1,3 +1,6 @@
+using System;
+
+[Flags]
 public enum EdgeDirection
 {
     None = 0,
