@@ -141,7 +141,7 @@ public class PlayerController : MonoBehaviour
     {
         if (_playerCamera != null)
         {
-            _playerCamera.UpdateLook(_input.Look);
+            _playerCamera.UpdateLook(_input.Look, _input.RollHeld);
         }
     }
 }

@@ -13,6 +13,7 @@ public class PlayerInput
     public bool SprintHeld => _actions.Player.Sprint.IsPressed();
     public bool SneakHeld => _actions.Player.Crouch.IsPressed();
     public bool JumpHeld => _actions.Player.Jump.IsPressed();
+    public bool RollHeld => _actions.Player.Roll.IsPressed();
 
     public bool PlaceBoardPressed => _actions.Player.PlaceBoard.WasPressedThisFrame();
     public bool RemoveBoardPressed => _actions.Player.RemoveBoard.WasPressedThisFrame();

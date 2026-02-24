@@ -9,6 +9,7 @@ public class PlayerCamera : MonoBehaviour
     private Rigidbody _playerRb;
     private float _xRotation;
     private float _yRotation;
+    private float _zRotation;
     private bool _isZeroGravity;
 
     public void Initialize(Transform playerBody)
@@ -24,7 +25,7 @@ public class PlayerCamera : MonoBehaviour
         _isZeroGravity = isZeroGravity;
     }
 
-    public void UpdateLook(Vector2 lookInput)
+    public void UpdateLook(Vector2 lookInput, bool rollHeld = false)
     {
         if (lookInput.sqrMagnitude < 0.01f) return;
 
@@ -33,12 +34,21 @@ public class PlayerCamera : MonoBehaviour
 
         if (_isZeroGravity)
         {
+            if (rollHeld)
+            {
+                _zRotation -= mouseX;
+                _zRotation = Mathf.Repeat(_zRotation + 180f, 360f) - 180f;
+            }
+            else
+            {
+                _yRotation += mouseX;
+                _yRotation = Mathf.Repeat(_yRotation + 180f, 360f) - 180f;
+            }
+
             _xRotation -= mouseY;
             _xRotation = Mathf.Repeat(_xRotation + 180f, 360f) - 180f;
-            _yRotation += mouseX;
-            _yRotation = Mathf.Repeat(_yRotation + 180f, 360f) - 180f;
 
-            Quaternion targetRotation = Quaternion.Euler(_xRotation, _yRotation, 0f);
+            Quaternion targetRotation = Quaternion.Euler(_xRotation, _yRotation, _zRotation);
             _playerRb.MoveRotation(targetRotation);
             transform.localRotation = Quaternion.identity;
         }
