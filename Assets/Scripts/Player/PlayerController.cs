@@ -78,6 +78,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        _input.Update();
         _toggleCooldown -= Time.deltaTime;
 
         HandleToggleGravity();

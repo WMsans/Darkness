@@ -67,9 +67,7 @@ public class GroundedState : IGravityState
 
     private void ApplyJump(Rigidbody rb, PlayerInput input)
     {
-        
         if (!input.JumpPressed) return;
-        Debug.Log("jump pressed:" + input.JumpPressed + ", grounded:" + IsGrounded(rb));
         if (!IsGrounded(rb)) return;
 
         rb.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);

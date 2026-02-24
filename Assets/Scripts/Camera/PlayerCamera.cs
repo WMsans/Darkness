@@ -6,12 +6,15 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float _groundedVerticalClamp = 80f;
 
     private Transform _playerBody;
+    private Rigidbody _playerRb;
     private float _xRotation;
+    private float _yRotation;
     private bool _isZeroGravity;
 
     public void Initialize(Transform playerBody)
     {
         _playerBody = playerBody;
+        _playerRb = playerBody.GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -28,12 +31,24 @@ public class PlayerCamera : MonoBehaviour
         float mouseX = lookInput.x * _sensitivity;
         float mouseY = lookInput.y * _sensitivity;
 
-        _xRotation -= mouseY;
-        _xRotation = _isZeroGravity
-            ? Mathf.Repeat(_xRotation + 180f, 360f) - 180f
-            : Mathf.Clamp(_xRotation, -_groundedVerticalClamp, _groundedVerticalClamp);
+        if (_isZeroGravity)
+        {
+            _xRotation -= mouseY;
+            _xRotation = Mathf.Repeat(_xRotation + 180f, 360f) - 180f;
+            _yRotation += mouseX;
+            _yRotation = Mathf.Repeat(_yRotation + 180f, 360f) - 180f;
 
-        transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
-        _playerBody.Rotate(Vector3.up * mouseX);
+            Quaternion targetRotation = Quaternion.Euler(_xRotation, _yRotation, 0f);
+            _playerRb.MoveRotation(targetRotation);
+            transform.localRotation = Quaternion.identity;
+        }
+        else
+        {
+            _xRotation -= mouseY;
+            _xRotation = Mathf.Clamp(_xRotation, -_groundedVerticalClamp, _groundedVerticalClamp);
+
+            transform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
+            _playerBody.Rotate(Vector3.up * mouseX);
+        }
     }
 }
