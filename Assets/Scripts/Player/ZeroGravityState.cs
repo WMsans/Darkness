@@ -72,7 +72,7 @@ public class ZeroGravityState : IGravityState
             rb.AddForce(moveDir * _accelerationForce, ForceMode.Force);
         }
 
-        if (input.JumpPressed)
+        if (input.JumpHeld)
         {
             rb.AddForce(up * _verticalForce, ForceMode.Force);
         }
@@ -98,7 +98,7 @@ public class ZeroGravityState : IGravityState
             desiredRelativeVelocity = (forward * moveInput.y + right * moveInput.x).normalized * _offsetSpeed;
         }
 
-        if (input.JumpPressed)
+        if (input.JumpHeld)
         {
             desiredRelativeVelocity += _cameraTransform.up * _offsetSpeed;
         }

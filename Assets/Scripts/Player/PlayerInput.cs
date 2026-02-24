@@ -12,6 +12,7 @@ public class PlayerInput
     public Vector2 Look => _actions.Player.Look.ReadValue<Vector2>();
     public bool SprintHeld => _actions.Player.Sprint.IsPressed();
     public bool SneakHeld => _actions.Player.Crouch.IsPressed();
+    public bool JumpHeld => _actions.Player.Jump.IsPressed();
 
     public bool JumpPressed
     {

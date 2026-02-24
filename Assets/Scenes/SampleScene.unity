@@ -687,7 +687,7 @@ Rigidbody:
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_AngularDamping: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -722,6 +722,7 @@ MonoBehaviour:
   _sneakMultiplier: 0.5
   _friction: 5
   _maxWalkSpeed: 5
+  _airAcceleration: 5
   _accelerationForce: 5
   _verticalForce: 5
   _matchVelocityForce: 5
