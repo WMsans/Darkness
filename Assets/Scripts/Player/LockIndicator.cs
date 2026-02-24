@@ -41,7 +41,7 @@ public class LockIndicator : MonoBehaviour
     {
         _target = target;
         _isLocked = isLocked;
-        _lastPosition = target.transform.position;
+        _lastPosition = target.transform.position + Vector3.one;
         
         UpdateVisuals();
         AnimateIn();
@@ -110,9 +110,21 @@ public class LockIndicator : MonoBehaviour
 
         if (_velocityText != null)
         {
-            Vector3 velocity = (_target.transform.position - _lastPosition) / Time.deltaTime;
-            float speed = velocity.magnitude;
-            _velocityText.text = speed > 0.1f ? $"{speed:F1} m/s" : "";
+            Vector3 toTarget = _target.transform.position - _camera.transform.position;
+            float currentDistance = toTarget.magnitude;
+            
+            if (_lastPosition.sqrMagnitude > 0.001f)
+            {
+                Vector3 lastToTarget = _lastPosition - _camera.transform.position;
+                float lastDistance = lastToTarget.magnitude;
+                float relativeSpeed = (lastDistance - currentDistance) / Time.deltaTime;
+                
+                string arrow = relativeSpeed < -0.1f ? "↓ " : (relativeSpeed > 0.1f ? "↑ " : "");
+                _velocityText.text = Mathf.Abs(relativeSpeed) > 0.1f 
+                    ? $"{arrow}{Mathf.Abs(relativeSpeed):F1} m/s" 
+                    : "";
+            }
+            
             _lastPosition = _target.transform.position;
         }
 
