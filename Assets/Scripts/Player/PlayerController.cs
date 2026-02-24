@@ -94,6 +94,7 @@ public class PlayerController : MonoBehaviour
         if (!_isGravityEnabled)
         {
             _targetLock.CheckRelease(transform);
+            _targetLock.UpdateCandidate();
         }
     }
 
