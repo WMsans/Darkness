@@ -40,6 +40,8 @@ public class ZeroGravityState : IGravityState
 
     public void FixedUpdate(Rigidbody rb, PlayerInput input)
     {
+        RotateBodyToCamera(rb);
+
         if (_targetLock.IsLocked)
         {
             ApplyLockedMovement(rb, input);
@@ -48,6 +50,12 @@ public class ZeroGravityState : IGravityState
         {
             ApplyFreeMovement(rb, input);
         }
+    }
+
+    private void RotateBodyToCamera(Rigidbody rb)
+    {
+        Quaternion targetRotation = Quaternion.LookRotation(_cameraTransform.forward, _cameraTransform.up);
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, 10f * Time.fixedDeltaTime));
     }
 
     private void ApplyFreeMovement(Rigidbody rb, PlayerInput input)
