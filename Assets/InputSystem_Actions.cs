@@ -190,6 +190,24 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PlaceBoard"",
+                    ""type"": ""Button"",
+                    ""id"": ""a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RemoveBoard"",
+                    ""type"": ""Button"",
+                    ""id"": ""c3d4e5f6-a7b8-4c5d-0e1f-2a3b4c5d6e7f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -597,6 +615,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""LockTarget"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""PlaceBoard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d4e5f6a7-b8c9-4d5e-1f2a-3b4c5d6e7f80"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""RemoveBoard"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1195,6 +1235,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_ToggleGravity = m_Player.FindAction("ToggleGravity", throwIfNotFound: true);
         m_Player_LockTarget = m_Player.FindAction("LockTarget", throwIfNotFound: true);
+        m_Player_PlaceBoard = m_Player.FindAction("PlaceBoard", throwIfNotFound: true);
+        m_Player_RemoveBoard = m_Player.FindAction("RemoveBoard", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1299,6 +1341,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_ToggleGravity;
     private readonly InputAction m_Player_LockTarget;
+    private readonly InputAction m_Player_PlaceBoard;
+    private readonly InputAction m_Player_RemoveBoard;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1354,6 +1398,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/LockTarget".
         /// </summary>
         public InputAction @LockTarget => m_Wrapper.m_Player_LockTarget;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/PlaceBoard".
+        /// </summary>
+        public InputAction @PlaceBoard => m_Wrapper.m_Player_PlaceBoard;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/RemoveBoard".
+        /// </summary>
+        public InputAction @RemoveBoard => m_Wrapper.m_Player_RemoveBoard;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1413,6 +1465,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @LockTarget.started += instance.OnLockTarget;
             @LockTarget.performed += instance.OnLockTarget;
             @LockTarget.canceled += instance.OnLockTarget;
+            @PlaceBoard.started += instance.OnPlaceBoard;
+            @PlaceBoard.performed += instance.OnPlaceBoard;
+            @PlaceBoard.canceled += instance.OnPlaceBoard;
+            @RemoveBoard.started += instance.OnRemoveBoard;
+            @RemoveBoard.performed += instance.OnRemoveBoard;
+            @RemoveBoard.canceled += instance.OnRemoveBoard;
         }
 
         /// <summary>
@@ -1457,6 +1515,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @LockTarget.started -= instance.OnLockTarget;
             @LockTarget.performed -= instance.OnLockTarget;
             @LockTarget.canceled -= instance.OnLockTarget;
+            @PlaceBoard.started -= instance.OnPlaceBoard;
+            @PlaceBoard.performed -= instance.OnPlaceBoard;
+            @PlaceBoard.canceled -= instance.OnPlaceBoard;
+            @RemoveBoard.started -= instance.OnRemoveBoard;
+            @RemoveBoard.performed -= instance.OnRemoveBoard;
+            @RemoveBoard.canceled -= instance.OnRemoveBoard;
         }
 
         /// <summary>
@@ -1834,6 +1898,20 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLockTarget(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PlaceBoard" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPlaceBoard(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RemoveBoard" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRemoveBoard(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
