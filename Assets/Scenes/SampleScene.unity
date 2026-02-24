@@ -716,10 +716,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 970c2e75ee614064ba9e24b50b5dfd8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _moveForce: 10
-  _jumpForce: 100
+  _moveForce: 32
+  _jumpForce: 10
   _sprintMultiplier: 1.5
   _sneakMultiplier: 0.5
+  _friction: 5
+  _maxWalkSpeed: 5
   _accelerationForce: 5
   _verticalForce: 5
   _matchVelocityForce: 5
@@ -727,7 +729,7 @@ MonoBehaviour:
   _lockRange: 100
   _lockRadius: 2
   _releaseRange: 200
-  _groundCheckDistance: 0.2
+  _groundCheckDistance: 2
   _groundCheckRadius: 0.3
   _groundLayer:
     serializedVersion: 2

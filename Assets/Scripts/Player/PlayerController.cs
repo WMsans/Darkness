@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private float _sprintMultiplier = 1.5f;
     [SerializeField] private float _sneakMultiplier = 0.5f;
+    [SerializeField] private float _friction = 5f;
+    [SerializeField] private float _maxWalkSpeed = 5f;
 
     [Header("Zero-G Settings")]
     [SerializeField] private float _accelerationForce = 5f;
@@ -52,7 +54,9 @@ public class PlayerController : MonoBehaviour
             _sneakMultiplier,
             _groundCheckDistance,
             _groundCheckRadius,
-            _groundLayer);
+            _groundLayer,
+            _friction,
+            _maxWalkSpeed);
 
         _zeroGravityState = new ZeroGravityState(
             _cameraTransform,
