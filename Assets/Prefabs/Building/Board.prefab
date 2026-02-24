@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3675096189188476851}
   - component: {fileID: 7829519306369496436}
   - component: {fileID: 3243834428391357757}
+  - component: {fileID: -8458942480412195588}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -112,3 +113,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-8458942480412195588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7079846004431084837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 986f83e17290eda4aa8e237f94c13b7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoardVisual
+  _meshRenderer: {fileID: 7829519306369496436}
+  _snapTriggerThickness: 0.1

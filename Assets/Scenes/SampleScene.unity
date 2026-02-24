@@ -716,7 +716,7 @@ MonoBehaviour:
   _placeDistance: 10
   _placeLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 9
   _enablePlacement: 1
 --- !u!1 &749180162
 GameObject:

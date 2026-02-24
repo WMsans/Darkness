@@ -30,6 +30,15 @@ public static class EdgeDetector
 
         if (Physics.Raycast(origin, direction, out RaycastHit hit, maxDistance, layerMask))
         {
+            BoardSnapZone snapZone = hit.collider.GetComponent<BoardSnapZone>();
+            if (snapZone != null)
+            {
+                GridEdge edge = snapZone.TargetEdge;
+                Vector3 worldPos = edge.GetWorldPosition(gridManager.CellSize);
+                bool isValid = !gridManager.HasBoardAtFace(edge) && gridManager.HasAdjacentBoard(edge);
+                return new EdgeHit(edge, isValid, worldPos);
+            }
+            
             return DetectFromHit(hit, gridManager);
         }
 
