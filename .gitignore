@@ -100,3 +100,7 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+/Assets/Editor Default Resources
+/Assets/Resources/GaskellgamesSettings.asset
+/Assets/Resources/GaskellgamesSettings.asset.meta
+/Assets/Editor Default Resources.meta
