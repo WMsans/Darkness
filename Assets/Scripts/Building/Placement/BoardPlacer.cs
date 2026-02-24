@@ -116,12 +116,12 @@ public class BoardPlacer : MonoBehaviour
     {
         return direction switch
         {
-            EdgeDirection.Up => Quaternion.Euler(-90, 0, 0),
-            EdgeDirection.Down => Quaternion.Euler(90, 0, 0),
+            EdgeDirection.Up => Quaternion.Euler(0, 0, 0),
+            EdgeDirection.Down => Quaternion.Euler(180, 0, 0),
             EdgeDirection.Left => Quaternion.Euler(0, 0, 90),
             EdgeDirection.Right => Quaternion.Euler(0, 0, -90),
-            EdgeDirection.Forward => Quaternion.Euler(0, 0, 0),
-            EdgeDirection.Back => Quaternion.Euler(0, 180, 0),
+            EdgeDirection.Forward => Quaternion.Euler(90, 0, 0),
+            EdgeDirection.Back => Quaternion.Euler(-90, 0, 0),
             _ => Quaternion.LookRotation(GridEdge.GetDirectionOffset(direction))
         };
     }
