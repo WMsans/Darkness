@@ -14,6 +14,10 @@ public class PlayerInput
     public bool SneakHeld => _actions.Player.Crouch.IsPressed();
     public bool JumpHeld => _actions.Player.Jump.IsPressed();
 
+    public bool PlaceBoardPressed => _actions.Player.PlaceBoard.WasPressedThisFrame();
+    public bool RemoveBoardPressed => _actions.Player.RemoveBoard.WasPressedThisFrame();
+    public bool PlaceBoardHeld => _actions.Player.PlaceBoard.IsPressed();
+
     public bool JumpPressed
     {
         get
