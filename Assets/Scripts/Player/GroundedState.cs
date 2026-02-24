@@ -12,6 +12,7 @@ public class GroundedState : IGravityState
     private readonly LayerMask _groundLayer;
     private readonly float _friction;
     private readonly float _maxWalkSpeed;
+    private readonly float _airAcceleration;
 
     public GroundedState(
         Transform cameraTransform,
@@ -23,7 +24,8 @@ public class GroundedState : IGravityState
         float groundCheckRadius,
         LayerMask groundLayer,
         float friction,
-        float maxWalkSpeed)
+        float maxWalkSpeed,
+        float airAcceleration)
     {
         _cameraTransform = cameraTransform;
         _moveForce = moveForce;
@@ -35,6 +37,7 @@ public class GroundedState : IGravityState
         _groundLayer = groundLayer;
         _friction = friction;
         _maxWalkSpeed = maxWalkSpeed;
+        _airAcceleration = airAcceleration;
     }
 
     public void Enter(Rigidbody rb)
@@ -83,7 +86,7 @@ public class GroundedState : IGravityState
         }
         else if (moveInput.sqrMagnitude >= 0.01f)
         {
-            float force = _moveForce;
+            float force = _airAcceleration;
             if (input.SprintHeld) force *= _sprintMultiplier;
             if (input.SneakHeld) force *= _sneakMultiplier;
 
