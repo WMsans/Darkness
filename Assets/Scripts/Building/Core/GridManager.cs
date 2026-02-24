@@ -122,39 +122,122 @@ public class GridManager : MonoBehaviour
             return CheckDiagonalAdjacency(edge);
         }
 
-        GridEdge opposite = new GridEdge(edge.Cell, GridEdge.GetOpposite(edge.Direction));
-        Vector3Int neighborCell = edge.Cell + Vector3Int.RoundToInt(GridEdge.GetDirectionOffset(edge.Direction));
-        GridEdge neighborEdge = new GridEdge(neighborCell, GridEdge.GetOpposite(edge.Direction));
+        foreach (GridEdge neighbor in GetSideTouchingNeighbors(edge))
+        {
+            if (HasEdge(neighbor))
+                return true;
+        }
 
-        if (HasEdge(opposite) || HasEdge(neighborEdge) || HasAnyBoardInCell(edge.Cell))
-            return true;
-
-        return HasAdjacentCell(edge.Cell);
+        return false;
     }
 
-    private bool HasAdjacentCell(Vector3Int cell)
+    /// <summary>
+    /// Returns all board positions that share a physical side (edge of the rectangle)
+    /// with the given board. For a cardinal face, the board rectangle has 4 sides.
+    /// Each side is shared by two potential boards:
+    ///   1. A same-direction board in the neighboring cell along that tangent axis
+    ///   2. A perpendicular board on the same cell whose face is in that tangent direction
+    /// This yields 8 potential side-touching neighbors for cardinal faces.
+    /// </summary>
+    private static List<GridEdge> GetSideTouchingNeighbors(GridEdge edge)
     {
-        Vector3Int[] offsets = new Vector3Int[]
-        {
-            Vector3Int.up,
-            Vector3Int.down,
-            Vector3Int.left,
-            Vector3Int.right,
-            Vector3Int.forward,
-            Vector3Int.back
-        };
+        var neighbors = new List<GridEdge>();
+        Vector3Int cell = edge.Cell;
+        EdgeDirection dir = edge.Direction;
 
-        foreach (var offset in offsets)
+        // Get the two tangent axes of the face plane.
+        // For a face with normal along axis N, the tangent axes are the other two cardinal axes.
+        GetTangentAxes(dir, out Vector3Int tangent1Pos, out Vector3Int tangent1Neg,
+                                 out EdgeDirection tangent1DirPos, out EdgeDirection tangent1DirNeg,
+                                 out Vector3Int tangent2Pos, out Vector3Int tangent2Neg,
+                                 out EdgeDirection tangent2DirPos, out EdgeDirection tangent2DirNeg);
+
+        // For each tangent direction (4 total: +/- on each of 2 axes):
+        // - Same face on neighboring cell along that tangent
+        // - Perpendicular face on the same cell in that tangent direction
+        neighbors.Add(new GridEdge(cell + tangent1Pos, dir));
+        neighbors.Add(new GridEdge(cell, tangent1DirPos));
+
+        neighbors.Add(new GridEdge(cell + tangent1Neg, dir));
+        neighbors.Add(new GridEdge(cell, tangent1DirNeg));
+
+        neighbors.Add(new GridEdge(cell + tangent2Pos, dir));
+        neighbors.Add(new GridEdge(cell, tangent2DirPos));
+
+        neighbors.Add(new GridEdge(cell + tangent2Neg, dir));
+        neighbors.Add(new GridEdge(cell, tangent2DirNeg));
+
+        return neighbors;
+    }
+
+    /// <summary>
+    /// For a cardinal face direction, outputs the two tangent axes as cell offsets
+    /// and their corresponding EdgeDirection values.
+    /// </summary>
+    private static void GetTangentAxes(EdgeDirection faceDir,
+        out Vector3Int t1Pos, out Vector3Int t1Neg, out EdgeDirection t1DirPos, out EdgeDirection t1DirNeg,
+        out Vector3Int t2Pos, out Vector3Int t2Neg, out EdgeDirection t2DirPos, out EdgeDirection t2DirNeg)
+    {
+        switch (faceDir)
         {
-            if (HasAnyBoardInCell(cell + offset))
+            case EdgeDirection.Up:
+            case EdgeDirection.Down:
+                // Normal is Y-axis, tangents are X and Z
+                t1Pos = Vector3Int.right;   t1Neg = Vector3Int.left;
+                t1DirPos = EdgeDirection.Right; t1DirNeg = EdgeDirection.Left;
+                t2Pos = Vector3Int.forward; t2Neg = Vector3Int.back;
+                t2DirPos = EdgeDirection.Forward; t2DirNeg = EdgeDirection.Back;
+                break;
+            case EdgeDirection.Left:
+            case EdgeDirection.Right:
+                // Normal is X-axis, tangents are Y and Z
+                t1Pos = Vector3Int.up;      t1Neg = Vector3Int.down;
+                t1DirPos = EdgeDirection.Up; t1DirNeg = EdgeDirection.Down;
+                t2Pos = Vector3Int.forward; t2Neg = Vector3Int.back;
+                t2DirPos = EdgeDirection.Forward; t2DirNeg = EdgeDirection.Back;
+                break;
+            case EdgeDirection.Forward:
+            case EdgeDirection.Back:
+                // Normal is Z-axis, tangents are X and Y
+                t1Pos = Vector3Int.right;   t1Neg = Vector3Int.left;
+                t1DirPos = EdgeDirection.Right; t1DirNeg = EdgeDirection.Left;
+                t2Pos = Vector3Int.up;      t2Neg = Vector3Int.down;
+                t2DirPos = EdgeDirection.Up; t2DirNeg = EdgeDirection.Down;
+                break;
+            default:
+                t1Pos = t1Neg = t2Pos = t2Neg = Vector3Int.zero;
+                t1DirPos = t1DirNeg = t2DirPos = t2DirNeg = EdgeDirection.None;
+                break;
+        }
+    }
+
+    private bool CheckDiagonalAdjacency(GridEdge edge)
+    {
+        // For diagonal edges, decompose into component cardinal directions
+        // and check if any of those cardinal faces on the same cell exist.
+        // A diagonal board shares a side with each cardinal face whose axis
+        // is one of the diagonal's component axes.
+        foreach (EdgeDirection component in GetCardinalComponents(edge.Direction))
+        {
+            if (HasEdge(new GridEdge(edge.Cell, component)))
                 return true;
         }
         return false;
     }
 
-    private bool CheckDiagonalAdjacency(GridEdge edge)
+    /// <summary>
+    /// Decomposes a flags-based EdgeDirection into its individual cardinal components.
+    /// </summary>
+    private static List<EdgeDirection> GetCardinalComponents(EdgeDirection dir)
     {
-        return HasAnyBoardInCell(edge.Cell);
+        var components = new List<EdgeDirection>();
+        if ((dir & EdgeDirection.Up) != 0) components.Add(EdgeDirection.Up);
+        if ((dir & EdgeDirection.Down) != 0) components.Add(EdgeDirection.Down);
+        if ((dir & EdgeDirection.Left) != 0) components.Add(EdgeDirection.Left);
+        if ((dir & EdgeDirection.Right) != 0) components.Add(EdgeDirection.Right);
+        if ((dir & EdgeDirection.Forward) != 0) components.Add(EdgeDirection.Forward);
+        if ((dir & EdgeDirection.Back) != 0) components.Add(EdgeDirection.Back);
+        return components;
     }
 
     public bool HasAnyBoardInCell(Vector3Int cell)
