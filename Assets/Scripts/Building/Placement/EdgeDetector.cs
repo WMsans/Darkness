@@ -38,6 +38,12 @@ public static class EdgeDetector
             return GetFreePlacementEdge(origin, direction, maxDistance, gridManager);
         }
 
+        EdgeHit freePlacement = GetFreePlacementEdge(origin, direction, maxDistance, gridManager);
+        if (gridManager.HasAdjacentBoard(freePlacement.Edge))
+        {
+            return new EdgeHit(freePlacement.Edge, true, freePlacement.WorldPosition);
+        }
+
         return EdgeHit.Invalid;
     }
 

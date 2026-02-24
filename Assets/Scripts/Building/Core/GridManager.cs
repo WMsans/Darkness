@@ -126,7 +126,30 @@ public class GridManager : MonoBehaviour
         Vector3Int neighborCell = edge.Cell + Vector3Int.RoundToInt(GridEdge.GetDirectionOffset(edge.Direction));
         GridEdge neighborEdge = new GridEdge(neighborCell, GridEdge.GetOpposite(edge.Direction));
 
-        return HasEdge(opposite) || HasEdge(neighborEdge) || HasAnyBoardInCell(edge.Cell);
+        if (HasEdge(opposite) || HasEdge(neighborEdge) || HasAnyBoardInCell(edge.Cell))
+            return true;
+
+        return HasAdjacentCell(edge.Cell);
+    }
+
+    private bool HasAdjacentCell(Vector3Int cell)
+    {
+        Vector3Int[] offsets = new Vector3Int[]
+        {
+            Vector3Int.up,
+            Vector3Int.down,
+            Vector3Int.left,
+            Vector3Int.right,
+            Vector3Int.forward,
+            Vector3Int.back
+        };
+
+        foreach (var offset in offsets)
+        {
+            if (HasAnyBoardInCell(cell + offset))
+                return true;
+        }
+        return false;
     }
 
     private bool CheckDiagonalAdjacency(GridEdge edge)
