@@ -109,6 +109,39 @@ public class GridManager : MonoBehaviour
         _events?.RaiseBoardRemoved(edge);
     }
 
+    /// <summary>
+    /// Replaces a board's visual with a reinforced version while keeping its position.
+    /// Returns true if successful, false if no board exists at the edge.
+    /// </summary>
+    public bool ReinforceBoard(GridEdge edge, GameObject reinforcedPrefab)
+    {
+        if (!_edges.TryGetValue(edge, out BoardData data))
+            return false;
+
+        DestroyBoardVisual(edge);
+
+        float placedTime = data.PlacedTime;
+
+        if (reinforcedPrefab != null)
+        {
+            Vector3 worldPos = edge.GetWorldPosition(_cellSize);
+            Quaternion rotation = GetBoardRotation(edge.Direction);
+
+            GameObject board = Instantiate(reinforcedPrefab, worldPos, rotation, transform);
+            board.name = $"Board_{edge.Cell}_{edge.Direction}_Reinforced";
+
+            BoardVisual visual = board.GetComponent<BoardVisual>();
+            if (visual != null)
+                visual.Initialize(edge);
+
+            _boardObjects[edge] = board;
+        }
+
+        _edges[edge] = new BoardData("reinforced", placedTime, data.CustomData);
+
+        return true;
+    }
+
     private void SpawnBoardVisual(GridEdge edge, BoardData data)
     {
         if (_boardPrefab == null) return;
