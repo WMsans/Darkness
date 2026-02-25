@@ -5,7 +5,8 @@ public class TechTreeController : MonoBehaviour
 {
     public CanvasGroup techTreeCG; // 拖入 TechTreePanel
     public RectTransform techTreeContent; // 拖入 Scroll View 下的 Content
-
+    public GameObject exitButton;
+    
     public void ShowTechTree()
     {
         // 激活并显示
@@ -18,6 +19,8 @@ public class TechTreeController : MonoBehaviour
 
         techTreeCG.interactable = true;
         techTreeCG.blocksRaycasts = true;
+        
+        exitButton.SetActive(true); 
     }
 
     public void HideTechTree()
@@ -27,5 +30,7 @@ public class TechTreeController : MonoBehaviour
         });
         techTreeCG.interactable = false;
         techTreeCG.blocksRaycasts = false;
+        
+        exitButton.SetActive(false); 
     }
 }

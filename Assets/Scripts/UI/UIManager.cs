@@ -6,6 +6,7 @@ public class UIManager : MonoBehaviour
     [Header("UI 设置")]
     public CanvasGroup pauseMenuCanvasGroup;
     public RectTransform menuContent; // 建议将 UI 内容放入一个子节点，方便做位移动效
+    public CanvasGroup techTreePanel;
 
     [Header("相机设置")]
     public float pauseFOV = 50f;     // 暂停时拉近视角
@@ -15,6 +16,10 @@ public class UIManager : MonoBehaviour
     [Header("控制脚本引用")]
     // 在此处拖入你的角色控制或相机控制脚本，如果没有，代码会尝试自动查找
     public MonoBehaviour cameraControlScript; 
+    
+    [Header("科技树配置")]
+    // 科技树里面的 Content 物体
+    public RectTransform techTreeContent;
 
     private bool isPaused = false;
 
@@ -122,5 +127,11 @@ public class UIManager : MonoBehaviour
             var placers = FindObjectsOfType<BoardPlacer>(true);
             foreach (var p in placers) p.SetPlacementEnabled(state);
         }
+    }
+    public void BackToMenu()
+    { 
+        // 1. 让科技树面板淡出并禁用交互
+        techTreePanel.interactable = false;
+        techTreePanel.blocksRaycasts = false;
     }
 }
