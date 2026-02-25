@@ -17,16 +17,17 @@ public struct InventorySlot
         _quantity = quantity;
     }
 
-    public bool CanAdd(int amount) => !IsEmpty && _quantity + amount <= _item.MaxStack;
+    public bool CanAdd(int amount) => !IsEmpty && amount > 0 && _quantity + amount <= _item.MaxStack;
 
     public void Add(int amount)
     {
-        if (IsEmpty) return;
+        if (IsEmpty || amount <= 0) return;
         _quantity += amount;
     }
 
     public void Remove(int amount)
     {
+        if (amount <= 0) return;
         _quantity -= amount;
         if (_quantity <= 0)
         {
