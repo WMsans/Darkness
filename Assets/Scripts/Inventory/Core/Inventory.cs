@@ -76,6 +76,8 @@ public class Inventory : MonoBehaviour
     {
         if (item == null || quantity <= 0) return false;
 
+        if (GetAvailableSpace(item) < quantity) return false;
+
         int remaining = quantity;
 
         // Fill existing stacks in hotbar first
@@ -239,6 +241,29 @@ public class Inventory : MonoBehaviour
             if (_gridSlots[i].IsEmpty) return i;
         }
         return -1;
+    }
+
+    private int GetAvailableSpace(ItemData item)
+    {
+        int space = 0;
+
+        for (int i = 0; i < _hotbarSlotCount; i++)
+        {
+            if (_hotbarSlots[i].IsEmpty)
+                space += item.MaxStack;
+            else if (_hotbarSlots[i].Item == item)
+                space += item.MaxStack - _hotbarSlots[i].Quantity;
+        }
+
+        for (int i = 0; i < _gridSlotCount; i++)
+        {
+            if (_gridSlots[i].IsEmpty)
+                space += item.MaxStack;
+            else if (_gridSlots[i].Item == item)
+                space += item.MaxStack - _gridSlots[i].Quantity;
+        }
+
+        return space;
     }
 
     public void DebugAddItem(ItemData item, int quantity)
