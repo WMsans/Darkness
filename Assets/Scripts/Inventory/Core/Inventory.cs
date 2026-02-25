@@ -1,0 +1,248 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Inventory : MonoBehaviour
+{
+    [Header("Settings")]
+    [SerializeField] private int _gridSlotCount = 24;
+    [SerializeField] private int _hotbarSlotCount = 8;
+
+    [Header("References")]
+    [SerializeField] private InventoryEvents _events;
+
+    private InventorySlot[] _gridSlots;
+    private InventorySlot[] _hotbarSlots;
+    private int _selectedHotbarIndex;
+
+    public int GridSlotCount => _gridSlotCount;
+    public int HotbarSlotCount => _hotbarSlotCount;
+    public int SelectedHotbarIndex => _selectedHotbarIndex;
+
+    public event System.Action OnInventoryChanged;
+
+    private void Awake()
+    {
+        _gridSlots = new InventorySlot[_gridSlotCount];
+        _hotbarSlots = new InventorySlot[_hotbarSlotCount];
+        
+        for (int i = 0; i < _gridSlotCount; i++)
+            _gridSlots[i] = InventorySlot.Empty;
+        
+        for (int i = 0; i < _hotbarSlotCount; i++)
+            _hotbarSlots[i] = InventorySlot.Empty;
+    }
+
+    public InventorySlot GetGridSlot(int index)
+    {
+        if (index < 0 || index >= _gridSlotCount) return InventorySlot.Empty;
+        return _gridSlots[index];
+    }
+
+    public InventorySlot GetHotbarSlot(int index)
+    {
+        if (index < 0 || index >= _hotbarSlotCount) return InventorySlot.Empty;
+        return _hotbarSlots[index];
+    }
+
+    public ItemData GetSelectedItem()
+    {
+        return GetHotbarSlot(_selectedHotbarIndex).Item;
+    }
+
+    public int GetQuantity(ItemData item)
+    {
+        if (item == null) return 0;
+
+        int total = 0;
+        for (int i = 0; i < _gridSlotCount; i++)
+        {
+            if (_gridSlots[i].Item == item)
+                total += _gridSlots[i].Quantity;
+        }
+        for (int i = 0; i < _hotbarSlotCount; i++)
+        {
+            if (_hotbarSlots[i].Item == item)
+                total += _hotbarSlots[i].Quantity;
+        }
+        return total;
+    }
+
+    public bool HasItem(ItemData item, int quantity)
+    {
+        return GetQuantity(item) >= quantity;
+    }
+
+    public bool TryAddItem(ItemData item, int quantity)
+    {
+        if (item == null || quantity <= 0) return false;
+
+        int remaining = quantity;
+
+        // Fill existing stacks in hotbar first
+        for (int i = 0; i < _hotbarSlotCount && remaining > 0; i++)
+        {
+            if (!_hotbarSlots[i].IsEmpty && _hotbarSlots[i].Item == item)
+            {
+                int canAdd = Mathf.Min(remaining, item.MaxStack - _hotbarSlots[i].Quantity);
+                if (canAdd > 0)
+                {
+                    _hotbarSlots[i].Add(canAdd);
+                    remaining -= canAdd;
+                    _events?.RaiseSlotChanged(i, true);
+                }
+            }
+        }
+
+        // Fill existing stacks in grid
+        for (int i = 0; i < _gridSlotCount && remaining > 0; i++)
+        {
+            if (!_gridSlots[i].IsEmpty && _gridSlots[i].Item == item)
+            {
+                int canAdd = Mathf.Min(remaining, item.MaxStack - _gridSlots[i].Quantity);
+                if (canAdd > 0)
+                {
+                    _gridSlots[i].Add(canAdd);
+                    remaining -= canAdd;
+                    _events?.RaiseSlotChanged(i, false);
+                }
+            }
+        }
+
+        // Find empty slots in hotbar
+        for (int i = 0; i < _hotbarSlotCount && remaining > 0; i++)
+        {
+            if (_hotbarSlots[i].IsEmpty)
+            {
+                int toAdd = Mathf.Min(remaining, item.MaxStack);
+                _hotbarSlots[i] = new InventorySlot(item, toAdd);
+                remaining -= toAdd;
+                _events?.RaiseSlotChanged(i, true);
+            }
+        }
+
+        // Find empty slots in grid
+        for (int i = 0; i < _gridSlotCount && remaining > 0; i++)
+        {
+            if (_gridSlots[i].IsEmpty)
+            {
+                int toAdd = Mathf.Min(remaining, item.MaxStack);
+                _gridSlots[i] = new InventorySlot(item, toAdd);
+                remaining -= toAdd;
+                _events?.RaiseSlotChanged(i, false);
+            }
+        }
+
+        if (remaining == 0)
+        {
+            _events?.RaiseItemAdded(item.ItemId, quantity);
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool TryRemoveItem(ItemData item, int quantity)
+    {
+        if (!HasItem(item, quantity)) return false;
+
+        int remaining = quantity;
+
+        // Remove from hotbar (reverse order)
+        for (int i = _hotbarSlotCount - 1; i >= 0 && remaining > 0; i--)
+        {
+            if (_hotbarSlots[i].Item == item)
+            {
+                int toRemove = Mathf.Min(remaining, _hotbarSlots[i].Quantity);
+                _hotbarSlots[i].Remove(toRemove);
+                remaining -= toRemove;
+                _events?.RaiseSlotChanged(i, true);
+            }
+        }
+
+        // Remove from grid (reverse order)
+        for (int i = _gridSlotCount - 1; i >= 0 && remaining > 0; i--)
+        {
+            if (_gridSlots[i].Item == item)
+            {
+                int toRemove = Mathf.Min(remaining, _gridSlots[i].Quantity);
+                _gridSlots[i].Remove(toRemove);
+                remaining -= toRemove;
+                _events?.RaiseSlotChanged(i, false);
+            }
+        }
+
+        _events?.RaiseItemRemoved(item.ItemId, quantity);
+        OnInventoryChanged?.Invoke();
+        return true;
+    }
+
+    public void SelectHotbarSlot(int index)
+    {
+        if (index < 0 || index >= _hotbarSlotCount) return;
+        _selectedHotbarIndex = index;
+        _events?.RaiseHotbarSelectionChanged(index);
+    }
+
+    public void MoveGridSlot(int fromIndex, int toIndex)
+    {
+        if (fromIndex < 0 || fromIndex >= _gridSlotCount) return;
+        if (toIndex < 0 || toIndex >= _gridSlotCount) return;
+
+        var temp = _gridSlots[fromIndex];
+        _gridSlots[fromIndex] = _gridSlots[toIndex];
+        _gridSlots[toIndex] = temp;
+
+        _events?.RaiseSlotChanged(fromIndex, false);
+        _events?.RaiseSlotChanged(toIndex, false);
+        OnInventoryChanged?.Invoke();
+    }
+
+    public void MoveHotbarSlot(int fromIndex, int toIndex)
+    {
+        if (fromIndex < 0 || fromIndex >= _hotbarSlotCount) return;
+        if (toIndex < 0 || toIndex >= _hotbarSlotCount) return;
+
+        var temp = _hotbarSlots[fromIndex];
+        _hotbarSlots[fromIndex] = _hotbarSlots[toIndex];
+        _hotbarSlots[toIndex] = temp;
+
+        _events?.RaiseSlotChanged(fromIndex, true);
+        _events?.RaiseSlotChanged(toIndex, true);
+        OnInventoryChanged?.Invoke();
+    }
+
+    public void SplitGridStack(int index)
+    {
+        if (index < 0 || index >= _gridSlotCount) return;
+        if (_gridSlots[index].IsEmpty) return;
+
+        int half = _gridSlots[index].Quantity / 2;
+        if (half == 0) return;
+
+        int emptyIndex = FindEmptyGridSlot();
+        if (emptyIndex == -1) return;
+
+        var item = _gridSlots[index].Item;
+        _gridSlots[index].Remove(half);
+        _gridSlots[emptyIndex] = new InventorySlot(item, half);
+
+        _events?.RaiseSlotChanged(index, false);
+        _events?.RaiseSlotChanged(emptyIndex, false);
+        OnInventoryChanged?.Invoke();
+    }
+
+    private int FindEmptyGridSlot()
+    {
+        for (int i = 0; i < _gridSlotCount; i++)
+        {
+            if (_gridSlots[i].IsEmpty) return i;
+        }
+        return -1;
+    }
+
+    public void DebugAddItem(ItemData item, int quantity)
+    {
+        TryAddItem(item, quantity);
+    }
+}
