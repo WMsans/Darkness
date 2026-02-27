@@ -1665,7 +1665,7 @@ MonoBehaviour:
   _placeDistance: 10
   _placeLayer:
     serializedVersion: 2
-    m_Bits: 9
+    m_Bits: 8
   _enablePlacement: 1
   _inventory: {fileID: 516548203}
   _boardItem: {fileID: 11400000, guid: 83fefd01d1b6ea344ad1a35a0b42a22b, type: 2}
