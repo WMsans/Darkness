@@ -13,6 +13,10 @@ public class BoardPlacer : MonoBehaviour
     [SerializeField] private LayerMask _placeLayer;
     [SerializeField] private bool _enablePlacement = true;
 
+    [Header("Inventory")]
+    [SerializeField] private Inventory _inventory;
+    [SerializeField] private ItemData _boardItem;
+
     private PlayerInput _input;
     private EdgeHit _currentEdgeHit;
 
@@ -95,8 +99,20 @@ public class BoardPlacer : MonoBehaviour
         if (_gridManager.HasBoardAtFace(_currentEdgeHit.Edge))
             return;
 
+        if (_inventory != null && _boardItem != null)
+        {
+            if (!_inventory.HasItem(_boardItem, 1))
+                return;
+        }
+
         BoardData data = BoardData.Default;
-        _gridManager.TryPlaceBoard(_currentEdgeHit.Edge, data);
+        if (_gridManager.TryPlaceBoard(_currentEdgeHit.Edge, data))
+        {
+            if (_inventory != null && _boardItem != null)
+            {
+                _inventory.TryRemoveItem(_boardItem, 1);
+            }
+        }
     }
 
     private void TryRemoveBoard()
