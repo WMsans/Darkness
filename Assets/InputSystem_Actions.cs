@@ -195,7 +195,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": ""PlaceBoard"",
                     ""type"": ""Button"",
                     ""id"": ""a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -204,7 +204,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": ""RemoveBoard"",
                     ""type"": ""Button"",
                     ""id"": ""c3d4e5f6-a7b8-4c5d-0e1f-2a3b4c5d6e7f"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InventoryDebug : MonoBehaviour
 {
@@ -14,7 +15,10 @@ public class InventoryDebug : MonoBehaviour
     {
         if (_inventory == null) return;
 
-        if (Input.GetKeyDown(KeyCode.Keypad1))
+        var keyboard = Keyboard.current;
+        if (keyboard == null) return;
+
+        if (keyboard.numpad1Key.wasPressedThisFrame)
         {
             if (_testBoard != null)
             {
@@ -23,7 +27,7 @@ public class InventoryDebug : MonoBehaviour
             }
         }
         
-        if (Input.GetKeyDown(KeyCode.Keypad2))
+        if (keyboard.numpad2Key.wasPressedThisFrame)
         {
             if (_testReinforcer != null)
             {
