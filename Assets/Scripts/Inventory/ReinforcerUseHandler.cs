@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ReinforcerUseHandler : MonoBehaviour
 {
@@ -13,6 +14,36 @@ public class ReinforcerUseHandler : MonoBehaviour
     [SerializeField] private float _useDistance = 10f;
     [SerializeField] private LayerMask _boardLayer;
 
+    private InputSystem_Actions _input;
+    private bool _attackPressed;
+
+    private void Awake()
+    {
+        _input = new InputSystem_Actions();
+    }
+
+    private void OnEnable()
+    {
+        _input.Enable();
+        _input.Player.Attack.performed += OnAttack;
+    }
+
+    private void OnDisable()
+    {
+        _input.Player.Attack.performed -= OnAttack;
+        _input.Disable();
+    }
+
+    private void OnDestroy()
+    {
+        _input?.Dispose();
+    }
+
+    private void OnAttack(InputAction.CallbackContext context)
+    {
+        _attackPressed = true;
+    }
+
     private void Update()
     {
         HandleReinforcerUse();
@@ -26,7 +57,8 @@ public class ReinforcerUseHandler : MonoBehaviour
         var selectedItem = _inventory.GetSelectedItem();
         if (selectedItem != _reinforcerItem) return;
 
-        if (!Input.GetMouseButtonDown(0)) return;
+        if (!_attackPressed) return;
+        _attackPressed = false;
 
         if (Physics.Raycast(_cameraTransform.position, _cameraTransform.forward, 
             out RaycastHit hit, _useDistance, _boardLayer))
