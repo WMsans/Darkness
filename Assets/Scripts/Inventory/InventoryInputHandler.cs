@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InventoryInputHandler : MonoBehaviour
 {
@@ -6,11 +7,41 @@ public class InventoryInputHandler : MonoBehaviour
     [SerializeField] private Inventory _inventory;
     [SerializeField] private InventoryGridUI _inventoryGridUI;
     
-    private PlayerInput _input;
+    private InputSystem_Actions _input;
+    private int _pendingHotbarSlot = -1;
+    private bool _toggleInventoryPressed;
 
     private void Awake()
     {
-        _input = new PlayerInput();
+        _input = new InputSystem_Actions();
+    }
+
+    private void OnEnable()
+    {
+        _input.Enable();
+        _input.Player.ToggleInventory.performed += OnToggleInventory;
+        _input.Player.Hotbar1.performed += ctx => OnHotbarSlot(0);
+        _input.Player.Hotbar2.performed += ctx => OnHotbarSlot(1);
+        _input.Player.Hotbar3.performed += ctx => OnHotbarSlot(2);
+        _input.Player.Hotbar4.performed += ctx => OnHotbarSlot(3);
+        _input.Player.Hotbar5.performed += ctx => OnHotbarSlot(4);
+        _input.Player.Hotbar6.performed += ctx => OnHotbarSlot(5);
+        _input.Player.Hotbar7.performed += ctx => OnHotbarSlot(6);
+        _input.Player.Hotbar8.performed += ctx => OnHotbarSlot(7);
+    }
+
+    private void OnDisable()
+    {
+        _input.Player.ToggleInventory.performed -= OnToggleInventory;
+        _input.Player.Hotbar1.performed -= ctx => OnHotbarSlot(0);
+        _input.Player.Hotbar2.performed -= ctx => OnHotbarSlot(1);
+        _input.Player.Hotbar3.performed -= ctx => OnHotbarSlot(2);
+        _input.Player.Hotbar4.performed -= ctx => OnHotbarSlot(3);
+        _input.Player.Hotbar5.performed -= ctx => OnHotbarSlot(4);
+        _input.Player.Hotbar6.performed -= ctx => OnHotbarSlot(5);
+        _input.Player.Hotbar7.performed -= ctx => OnHotbarSlot(6);
+        _input.Player.Hotbar8.performed -= ctx => OnHotbarSlot(7);
+        _input.Disable();
     }
 
     private void OnDestroy()
@@ -18,26 +49,19 @@ public class InventoryInputHandler : MonoBehaviour
         _input?.Dispose();
     }
 
-    private void Update()
+    private void OnToggleInventory(InputAction.CallbackContext context)
     {
-        if (_inventory == null) return;
+        if (_inventoryGridUI != null)
+        {
+            _inventoryGridUI.Toggle();
+        }
+    }
 
-        _input.Update();
-
-        // Hotbar slot selection (1-8 keys)
-        int slotIndex = _input.HotbarSlotPressed;
-        if (slotIndex >= 0)
+    private void OnHotbarSlot(int slotIndex)
+    {
+        if (_inventory != null)
         {
             _inventory.SelectHotbarSlot(slotIndex);
-        }
-
-        // Inventory toggle (I or Tab)
-        if (_input.ToggleInventoryPressed)
-        {
-            if (_inventoryGridUI != null)
-            {
-                _inventoryGridUI.Toggle();
-            }
         }
     }
 }
